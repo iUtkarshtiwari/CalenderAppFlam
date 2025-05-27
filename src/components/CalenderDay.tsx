@@ -2,7 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import { formatDate, isCurrentMonth, isCurrentDay } from '../utils/DateUtils';
 import { CalendarEvent } from '../types';
-import { getEventsForDate } from '../utils/EventUtils';
 import { isRecurringEvent } from '../utils/recurrence';
 
 interface CalendarDayProps {
@@ -20,16 +19,22 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
 }) => {
   const isThisMonth = isCurrentMonth(date, baseDate);
   const isToday = isCurrentDay(date);
-  const dayEvents = events.filter(event => 
-    event.date.toDateString() === date.toDateString() || 
-    (event.isRecurring && isRecurringEvent(date, event))
+
+  const dayEvents = events.filter(
+    (event) =>
+      event.date.toDateString() === date.toDateString() ||
+      (event.isRecurring && isRecurringEvent(date, event))
   );
 
-  const recurringEvents = dayEvents.filter(event => event.isRecurring);
-  const regularEvents = dayEvents.filter(event => !event.isRecurring);
+  const recurringEvents = dayEvents.filter((event) => event.isRecurring);
+  const regularEvents = dayEvents.filter((event) => !event.isRecurring);
+
+  const maxVisibleEvents = 3;
+  const totalEvents = dayEvents.length;
 
   return (
     <button
+      type="button"
       onClick={() => onSelectDate(date)}
       className={clsx(
         'w-full aspect-square flex flex-col items-stretch p-1 rounded-lg',
@@ -41,6 +46,7 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
           'text-white': isToday,
         }
       )}
+      aria-label={`Select date ${formatDate(date, 'PP')}, ${totalEvents} events`}
     >
       <span
         className={clsx('text-sm self-center mb-1', {
@@ -49,16 +55,17 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
       >
         {formatDate(date, 'd')}
       </span>
-      
+
       {recurringEvents.length > 0 && (
         <div className="flex flex-wrap gap-1 overflow-hidden">
-          {recurringEvents.map((event) => (
+          {recurringEvents.slice(0, maxVisibleEvents).map((event) => (
             <div
               key={event.id}
               className="w-full h-2 rounded-full flex items-center"
               style={{ backgroundColor: event.color }}
+              title={`${event.title} (Recurring)`}
             >
-              <span className="text-[8px] text-white px-1">↻</span>
+              <span className="text-[8px] text-white px-1 select-none">↻</span>
             </div>
           ))}
         </div>
@@ -66,19 +73,22 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
 
       {regularEvents.length > 0 && (
         <div className="flex flex-wrap gap-1 overflow-hidden mt-1">
-          {regularEvents.map((event) => (
-            <div
-              key={event.id}
-              className="w-full h-2 rounded-full"
-              style={{ backgroundColor: event.color }}
-            />
-          ))}
+          {regularEvents
+            .slice(0, maxVisibleEvents - recurringEvents.length)
+            .map((event) => (
+              <div
+                key={event.id}
+                className="w-full h-2 rounded-full"
+                style={{ backgroundColor: event.color }}
+                title={event.title}
+              />
+            ))}
         </div>
       )}
 
-      {dayEvents.length > 3 && (
-        <span className="text-xs text-gray-500 mt-1">
-          +{dayEvents.length - 3} more
+      {totalEvents > maxVisibleEvents && (
+        <span className="text-xs text-gray-500 mt-1 select-none">
+          +{totalEvents - maxVisibleEvents} more
         </span>
       )}
     </button>
