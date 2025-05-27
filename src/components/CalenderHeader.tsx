@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatDate } from '../utils/DateUtils';
-
+import './CalenderHeader.css';
 interface CalendarHeaderProps {
   currentDate: Date;
   onPrevMonth: () => void;
@@ -13,24 +13,18 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onNextMonth,
 }) => {
   return (
-    <div className="flex items-center justify-between px-6 py-4">
-      <h2 className="text-xl font-semibold text-gray-800">
+      <div className="calendar-header">
+      <h2 className="calendar-header-title">
         {formatDate(currentDate, 'MMMM yyyy')}
       </h2>
-      <div className="flex space-x-2">
-        <button
-          onClick={onPrevMonth}
-          className="p-2 rounded-lg hover:bg-gray-100"
-        >
+      <div className="calendar-header-buttons">
+        <button onClick={onPrevMonth} className="calendar-header-button">
           ←
         </button>
-        <button
-          onClick={onNextMonth}
-          className="p-2 rounded-lg hover:bg-gray-100"
-        >
+        <button onClick={onNextMonth} className="calendar-header-button">
           →
         </button>
       </div>
     </div>
-  );
+    );
 };

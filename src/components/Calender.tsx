@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { addMonths, subMonths } from 'date-fns';
 import { generateCalendarDays, isPastDate } from '../utils/DateUtils';
 import { generateEventId } from '../utils/EventUtils';
+import { generateRecurringDates, isRecurringEvent } from '../utils/recurrence';
 import { CalendarHeader } from './CalenderHeader';
 import { WeekdayHeader } from './WeekdayHeader';
 import { CalendarDay } from './CalenderDay';
 import { EventList } from './EventList';
 import { EventModal } from './EventModal';
 import { CalendarEvent, EventFormData } from '../types';
-
+import './Calender.css';
 export const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -40,7 +41,6 @@ export const Calendar: React.FC = () => {
 
   const handleEventSubmit = (formData: EventFormData) => {
     if (editingEvent) {
-      // Update existing event
       setEvents((prevEvents) =>
         prevEvents.map((event) =>
           event.id === editingEvent.id
@@ -49,7 +49,6 @@ export const Calendar: React.FC = () => {
         )
       );
     } else {
-      // Add new event
       const newEvent: CalendarEvent = {
         id: generateEventId(),
         date: selectedDate!,
@@ -63,33 +62,31 @@ export const Calendar: React.FC = () => {
   const calendarDays = generateCalendarDays(currentDate);
   const selectedDateEvents = selectedDate
     ? events.filter(
-        (event) => event.date.toDateString() === selectedDate.toDateString()
+        (event) =>
+          event.date.toDateString() === selectedDate.toDateString() ||
+          (event.isRecurring && isRecurringEvent(selectedDate, event))
       )
     : [];
 
   return (
-    <div className="flex gap-6 max-w-7xl mx-auto">
-      <div> 
-        <h1 className='text-white font-semibold text-3xl underline'>My Calender Application</h1>
-        <p className='mt-8 text-white text-2xl'>Features</p>
-        <ul className='text-white mt-4 list-disc'>
-          <li>Display grid for the current month.</li>
-          <li>Allows to switch between months.</li>
-          <li>Add Update and delete events along with time.</li>
-          <li>Display event in a separate panel</li> 
-          <li>Clean and modern UI.</li>
-        </ul>
-      </div>
-      {/* Calendar Section */}
-      <div className="flex-1 bg-white rounded-xl shadow-lg">
+  <div>
+    <h1 className="page-heading">Welcome to Your Calendar Guide</h1>
+    <div className="calendar-container">
+      {/* Remove this block:
+        <div className="calendar-sidebar"> 
+          <h1 className="calendar-title">Welcome to You Calender Guide</h1>
+          <ul className="calendar-list"></ul>
+        </div>
+      */}
+      <div className="calendar-main">
         <CalendarHeader
           currentDate={currentDate}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
         />
-        <div className="p-4">
+        <div className="calendar-main-content">
           <WeekdayHeader />
-          <div className="grid grid-cols-7 gap-1 mt-2">
+          <div className="calendar-grid">
             {calendarDays.map((day) => (
               <CalendarDay
                 key={day.toISOString()}
@@ -103,11 +100,10 @@ export const Calendar: React.FC = () => {
         </div>
       </div>
 
-      {/* Events Panel */}
-      <div className="w-96 bg-white rounded-xl shadow-lg h-fit">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-medium text-gray-900">
+      <div className="calendar-sidebar-panel">
+        <div className="calendar-panel-content">
+          <div className="calendar-panel-header">
+            <h3 className="calendar-panel-title">
               {selectedDate ? (
                 <>Events for {selectedDate.toLocaleDateString()}</>
               ) : (
@@ -119,7 +115,7 @@ export const Calendar: React.FC = () => {
             <>
               <button
                 onClick={handleAddEvent}
-                className="w-full mb-6 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                className="calendar-add-button"
               >
                 Add Event
               </button>
@@ -144,11 +140,15 @@ export const Calendar: React.FC = () => {
                 title: editingEvent.title,
                 description: editingEvent.description || '',
                 color: editingEvent.color || '#3B82F6',
+                isRecurring: editingEvent.isRecurring || false,
+                recurrence: editingEvent.recurrence,
               }
             : undefined
         }
         title={editingEvent ? 'Edit Event' : 'Add Event'}
       />
     </div>
+  </div>
+
   );
 };

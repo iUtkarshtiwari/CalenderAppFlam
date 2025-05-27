@@ -23,7 +23,6 @@ export const EventList: React.FC<EventListProps> = ({
     );
   }
 
-  // Sort events by time
   const sortedEvents = [...events].sort((a, b) => {
     if (!a.time && !b.time) return 0;
     if (!a.time) return 1;
@@ -51,6 +50,11 @@ export const EventList: React.FC<EventListProps> = ({
                 <h4 className="text-sm font-medium text-gray-900">
                   {event.title}
                 </h4>
+                {event.isRecurring && (
+                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                    ↻ Recurring
+                  </span>
+                )}
                 {event.time && (
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                     {event.time}

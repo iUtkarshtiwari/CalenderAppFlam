@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { EventFormData } from '../types';
+import RecurrenceOptions from './RecurrenceOptions';
 
 interface EventFormProps {
   onSubmit: (data: EventFormData) => void;
@@ -11,15 +12,16 @@ const DEFAULT_FORM_DATA: EventFormData = {
   title: '',
   description: '',
   time: '',
-  color: '#3B82F6'
+  color: '#3B82F6',
+  isRecurring: false
 };
 
 const COLORS = [
-  '#3B82F6', // blue
-  '#EF4444', // red
-  '#10B981', // green
-  '#F59E0B', // yellow
-  '#8B5CF6', // purple
+  '#3B82F6', 
+  '#EF4444', 
+  '#10B981', 
+  '#F59E0B', 
+  '#8B5CF6',
 ];
 
 export const EventForm: React.FC<EventFormProps> = ({
@@ -87,6 +89,27 @@ export const EventForm: React.FC<EventFormProps> = ({
           ))}
         </div>
       </div>
+
+      <div>
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={formData.isRecurring}
+            onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
+            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm font-medium text-gray-700">Make this a recurring event</span>
+        </label>
+      </div>
+
+      {formData.isRecurring && (
+        <div className="border-t pt-4">
+          <RecurrenceOptions
+            onChange={(recurrence) => setFormData({ ...formData, recurrence })}
+            initialValue={formData.recurrence}
+          />
+        </div>
+      )}
 
       <div className="flex justify-end space-x-2">
         <button

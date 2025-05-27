@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { formatDate, isCurrentMonth, isCurrentDay } from '../utils/DateUtils';
 import { CalendarEvent } from '../types';
 import { getEventsForDate } from '../utils/EventUtils';
+import { isRecurringEvent } from '../utils/recurrence';
 
 interface CalendarDayProps {
   date: Date;
@@ -19,7 +20,13 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
 }) => {
   const isThisMonth = isCurrentMonth(date, baseDate);
   const isToday = isCurrentDay(date);
-  const dayEvents = getEventsForDate(events, date);
+  const dayEvents = events.filter(event => 
+    event.date.toDateString() === date.toDateString() || 
+    (event.isRecurring && isRecurringEvent(date, event))
+  );
+
+  const recurringEvents = dayEvents.filter(event => event.isRecurring);
+  const regularEvents = dayEvents.filter(event => !event.isRecurring);
 
   return (
     <button
@@ -42,21 +49,37 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
       >
         {formatDate(date, 'd')}
       </span>
-      {dayEvents.length > 0 && (
+      
+      {recurringEvents.length > 0 && (
         <div className="flex flex-wrap gap-1 overflow-hidden">
-          {dayEvents.slice(0, 2).map((event) => (
+          {recurringEvents.map((event) => (
+            <div
+              key={event.id}
+              className="w-full h-2 rounded-full flex items-center"
+              style={{ backgroundColor: event.color }}
+            >
+              <span className="text-[8px] text-white px-1">↻</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {regularEvents.length > 0 && (
+        <div className="flex flex-wrap gap-1 overflow-hidden mt-1">
+          {regularEvents.map((event) => (
             <div
               key={event.id}
               className="w-full h-2 rounded-full"
               style={{ backgroundColor: event.color }}
             />
           ))}
-          {dayEvents.length > 2 && (
-            <span className="text-xs text-gray-500">
-              +{dayEvents.length - 2}
-            </span>
-          )}
         </div>
+      )}
+
+      {dayEvents.length > 3 && (
+        <span className="text-xs text-gray-500 mt-1">
+          +{dayEvents.length - 3} more
+        </span>
       )}
     </button>
   );
