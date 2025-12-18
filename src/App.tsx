@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Calendar } from './components/Calender';
 import shortlinkConfig from './shortlink.config.json';
 
@@ -25,13 +26,9 @@ export default function App() {
     const iosDeepLink = `${aaiConfig.ios.scheme}://${iosPath}?${queryParams}`;
     const androidDeepLink = `${aaiConfig.android.scheme}://${androidPath}?${queryParams}`;
     console.log('iosDeepLink', iosDeepLink);
-    if(iosDeepLink) {
-      alert(iosDeepLink);
-    }
+   
     console.log('androidDeepLink', androidDeepLink);
-    if(androidDeepLink) {
-      alert(androidDeepLink);
-    }
+   
     const userAgent = navigator.userAgent || '';
     const isAndroid = /Android/i.test(userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
@@ -39,7 +36,7 @@ export default function App() {
     // Prefer deep link on mobile, fall back to web URL on desktop.
     if (isAndroid) {
       // i want to see the link in the alert toast message section of the browser
-      alert(androidDeepLink);
+      // alert(androidDeepLink);
       // Alert.alert('androidDeepLink', androidDeepLink);
       window.location.href = androidDeepLink || webUrl;
     } else if (isIOS) {
@@ -53,7 +50,15 @@ export default function App() {
   return (
     <div className="min-h-screen bg-sky-100 p-4">
       <Calendar />
-      <button onClick={openAAI}>Open AAI Power BI Dashboard</button>
+
+      <button onClick={openAAI} style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Open AAI Power BI Dashboard</button>
+      {showIframe && (
+        <iframe
+          src={iframeUrl}
+          title="AAI Power BI Dashboard"
+          style={{ width: '100%', height: '600px', border: 'none', marginTop: '20px' }}
+        />
+      )}
     </div>
   );
 }
