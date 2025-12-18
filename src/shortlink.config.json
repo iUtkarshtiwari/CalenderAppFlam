@@ -1,0 +1,22 @@
+{
+    "aai": {
+      "description": "Airport Authority of India mobile app deep link",
+      "path": "(tabs)/raise",
+      "android": {
+        "scheme": "aai",
+        "package": "com.softtech.aai",
+        "fallback": "https://qms.civitinfra.in"
+      }, 
+      "ios": {
+        "scheme": "aai",
+        "fallback": "https://qms.civitinfra.in",
+        "path": "(tabs)/raise"
+      },
+      "web": {
+        "url": "https://qms.civitinfra.in",
+        "path": "dashboard/queries/raise/new"
+      }
+    }
+  }
+  
+  
