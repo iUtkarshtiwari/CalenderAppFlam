@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import { Calendar } from './components/Calender';
 import shortlinkConfig from './shortlink.config.json';
 
 export default function App() {
-     const [showIframe, setShowIframe] = useState(false);
-  const [iframeUrl, setIframeUrl] = useState('');
  function openAAI() {
 
     // Build URL / deep link from shortlink.config.json
@@ -42,8 +39,7 @@ export default function App() {
     } else if (isIOS) {
       window.location.href = iosDeepLink || webUrl;
     } else {
-      setIframeUrl(webUrl);
-      setShowIframe(true);
+      window.location.href = webUrl;
     }
  }
   
@@ -52,13 +48,6 @@ export default function App() {
       <Calendar />
 
       <button onClick={openAAI} style={{ backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Open AAI Power BI Dashboard</button>
-      {showIframe && (
-        <iframe
-          src={iframeUrl}
-          title="AAI Power BI Dashboard"
-          style={{ width: '100%', height: '600px', border: 'none', marginTop: '20px' }}
-        />
-      )}
     </div>
   );
 }
